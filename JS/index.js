@@ -48,7 +48,7 @@ function Calculate () {
       case '=' :
         var inputValue = document.getElementsByName('display')[0].value;
         var output = operators[newValue](inputValue);
-        if(!isNaN(output)){
+        if(!isNaN(output) && isFinite(output) ){
           var storeValue = {'input' : inputValue, 'output' : output};
           if(this.storedKey > 0 ){
               localStorage.setItem(this.storedKey,JSON.stringify(storeValue));
@@ -63,7 +63,7 @@ function Calculate () {
           }
           document.getElementsByName('display')[0].value = output;
           this.evaluateInput ();
-        }else{
+        }else {
           document.getElementsByName('display')[0].value = output;
         }
       break;
