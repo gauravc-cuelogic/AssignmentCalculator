@@ -1,9 +1,3 @@
-/*
-localStorage.setItem('favoriteflavor','vanilla');
-var taste = localStorage.getItem('favoriteflavor');
-alert(taste);
-localStorage.removeItem('favoriteflavor');
-*/
 function Calculate () {
   var operators = {
     '+': function(a, b) { return a + b },
@@ -23,7 +17,7 @@ function Calculate () {
      return new Function('return ' + fn)();
    }
 
-   function evaluateInput () {
+   this.evaluateInput = function  () {
      document.getElementById("listCalculations").innerHTML = "";
      var ul = document.createElement('ul');
      document.getElementById('listCalculations').appendChild(ul);
@@ -31,36 +25,47 @@ function Calculate () {
      Object.keys(localStorage).forEach(function(key){
        if(key != 'clickcount'){
          var li = document.createElement('li');
-         li.setAttribute('class','item');
+
          ul.appendChild(li);
          var input = JSON.parse(localStorage.getItem(key));
-         var result = input.input + '=' + input.output;
+         var result = '<span onclick="loadInputs('+key+')" class="cursor">'+input.input + '=' + input.output+'</span>';
          li.innerHTML=li.innerHTML + result;
+
+         var span = document.createElement('span');
+         span.setAttribute('onclick','deleteCalculation("'+key+'")');
+         span.setAttribute('class' , 'cursor');
+         span.innerHTML= '   X';
+         li.appendChild(span);
       }
      });
    }
 
   this.storedKey = 0;
   this.setInput = function (newValue) {
+
     switch (newValue) {
 
       case '=' :
         var inputValue = document.getElementsByName('display')[0].value;
         var output = operators[newValue](inputValue);
-        var storeValue = {'input' : inputValue, 'output' : output};
-        if(this.storedKey > 0 ){
-            localStorage.setItem(this.storedKey,storeValue);
-            this.storedKey = 0;
-        }else{
-          if (localStorage.clickcount) {
-              localStorage.clickcount = Number(localStorage.clickcount) + 1;
-          } else {
-              localStorage.clickcount = 1;
+        if(!isNaN(output)){
+          var storeValue = {'input' : inputValue, 'output' : output};
+          if(this.storedKey > 0 ){
+              localStorage.setItem(this.storedKey,JSON.stringify(storeValue));
+              this.storedKey = 0;
+          }else{
+            if (localStorage.clickcount) {
+                localStorage.clickcount = Number(localStorage.clickcount) + 1;
+            } else {
+                localStorage.clickcount = 1;
+            }
+            localStorage.setItem(localStorage.clickcount,JSON.stringify(storeValue));
           }
-          localStorage.setItem(localStorage.clickcount,JSON.stringify(storeValue));
+          document.getElementsByName('display')[0].value = output;
+          this.evaluateInput ();
+        }else{
+          document.getElementsByName('display')[0].value = output;
         }
-        document.getElementsByName('display')[0].value = output;
-        evaluateInput ();
       break;
 
       case 'C' :
